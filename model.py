@@ -2,7 +2,7 @@ import tensorflow as tf
 
 l = tf.keras.layers
 
-def _conv_block(inputs, filters, repeat=2):
+def _conv_block(inputs: tf.Tensor, filters: int, repeat=2) -> tf.Tensor:
     """2 3x3 2d convolutions with ReLU"""
     layer = inputs
     for _ in range(repeat):
@@ -10,10 +10,11 @@ def _conv_block(inputs, filters, repeat=2):
     return layer
 
 
-def _up_conv(inputs):
+def _up_conv(inputs: tf.Tensor) -> tf.Tensor:
     input_shape = inputs.get_shape().as_list()
     size = [2*input_shape[1], 2*input_shape[2]]
-    # Try nearest neighbour resize method https://medium.com/towards-data-science/autoencoders-introduction-and-implementation-3f40483b0a85
+    # Try nearest neighbour resize method 
+    # https://medium.com/towards-data-science/autoencoders-introduction-and-implementation-3f40483b0a85
     return tf.image.resize_images(inputs, size=size)
 
 
@@ -23,6 +24,8 @@ def unet_model(features, labels, mode, params):
     # Provide sample of original image to tensorboard
     tf.summary.image('inputs', features['image'])
     
+    # Even though we have two classes we are actually only predicting one
+    # The other is given by its abscence and hence binary classification
     NUM_CLASSES = 1
     
     if labels is not None:
@@ -56,11 +59,17 @@ def unet_model(features, labels, mode, params):
     # Conv 1x1 to get output segmentation map
     logits = l.Conv2D(filters=NUM_CLASSES, kernel_size=1, activation=None, padding='same')(net)
 
-    head = tf.contrib.estimator.binary_classification_head()
+    if NUM_CLASSES < 2:
+        head = tf.contrib.estimator.binary_classification_head()
+    else:
+        head = tf.contrib.estimator.multi_class_head(n_classes=NUM_CLASSES)
+
+    optimizer = tf.train.AdamOptimizer(learning_rate=params['learning_rate'])
+
     return head.create_estimator_spec(
         features=features,
         mode=mode,
         labels=labels,
-        optimizer=tf.train.AdamOptimizer(learning_rate=params['learning_rate']),
+        optimizer=optimizer,
         logits=logits)
 

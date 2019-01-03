@@ -71,7 +71,7 @@ def convert_to_tfrecords(data_set: List[Tuple[str, str]], name: str, data_direct
                         }))
                         writer.write(example.SerializeToString())
 
-def main(data_dir: str, output_dir: str):
+def prepare(data_dir: str, output_dir: str):
 
     labels_path = os.path.join(data_dir, 'AerialImageDataset/train/gt')
     frames_path = os.path.join(data_dir, 'AerialImageDataset/train/images')
@@ -94,5 +94,5 @@ if __name__ == '__main__':
     parser.add_argument('--output-dir', help='Directory where TFRecord files are to be written')
     args = parser.parse_args()
 
-    main(**vars(args))
+    prepare(**vars(args))
 

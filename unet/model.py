@@ -59,8 +59,13 @@ def unet_model(features, labels, mode, params):
     # Conv 1x1 to get output segmentation map
     logits = l.Conv2D(filters=NUM_CLASSES, kernel_size=1, activation=None, padding='same')(net)
 
+
     if NUM_CLASSES < 2:
         head = tf.contrib.estimator.binary_classification_head()
+
+        # provide summary for predicted output
+        predictions = tf.math.round(tf.math.sigmoid(logits))
+        tf.summary.image('predictions', predictions)
     else:
         head = tf.contrib.estimator.multi_class_head(n_classes=NUM_CLASSES)
 

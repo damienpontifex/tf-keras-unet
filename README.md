@@ -1,5 +1,7 @@
 # TensorFlow-Keras Unet
 
+Semantic segmentation with Unet model architecture. Equally valid for other datasets but changing classification head from binary to softmax multi class.
+
 ## Inria Aerial Images
 The [Inria Aerial Image Labelling Dataset](https://project.inria.fr/aerialimagelabeling/) contains pixel labels from satellite images for two semantic classes: building and not building
 
@@ -22,3 +24,11 @@ unzip NEW2-AerialImageDataset.zip
 rm -i aerialimagelabeling.7z.* 
 rm -i NEW2-AerialImageDataset.zip
 ```
+
+### Preparation
+Explain preparation into TFRecords
+
+### Training
+TODO: Provide sample images for input, output, metrics etc
+
+### Serving

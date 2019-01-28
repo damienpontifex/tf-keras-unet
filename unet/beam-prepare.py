@@ -18,7 +18,7 @@ def _int64_feature(value):
 def _bytes_feature(value):
     return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
 
-def rgb2gray(rgb) -> np.ndarray:
+def rgb2gray(rgb):
     return np.dot(rgb[..., :3], [0.299, 0.587, 0.114])
 
 def np_from_img_path(path: str, gray=False):

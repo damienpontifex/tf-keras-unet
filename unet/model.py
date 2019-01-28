@@ -3,7 +3,7 @@ import tensorflow as tf
 l = tf.keras.layers
 
 def _conv_block(inputs: tf.Tensor, filters: int, repeat=2) -> tf.Tensor:
-    """2 3x3 2d convolutions with ReLU"""
+    """Repeated 3x3 2d convolutions with ReLU"""
     layer = inputs
     for _ in range(repeat):
         layer = l.Conv2D(filters, kernel_size=3, activation=tf.nn.relu, padding='same')(layer)
@@ -11,6 +11,7 @@ def _conv_block(inputs: tf.Tensor, filters: int, repeat=2) -> tf.Tensor:
 
 
 def _up_conv(inputs: tf.Tensor) -> tf.Tensor:
+    """Deconvolution"""
     input_shape = inputs.get_shape().as_list()
     size = [2*input_shape[1], 2*input_shape[2]]
     # Try nearest neighbour resize method 

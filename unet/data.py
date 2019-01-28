@@ -39,12 +39,12 @@ def make_dataset(file_pattern, num_epochs=None, batch_size=32, shuffle=True):
     }
 
     dataset = tf.data.experimental.make_batched_features_dataset(
-        file_pattern, batch_size, features, 
-        num_epochs=num_epochs, shuffle=shuffle, 
+        file_pattern, batch_size, features,
+        num_epochs=num_epochs, shuffle=shuffle,
         shuffle_buffer_size=4*batch_size, sloppy_ordering=True,
         reader_num_threads=os.cpu_count(), parser_num_threads=os.cpu_count(),
         prefetch_buffer_size=4)
- 
+
     dataset = dataset.map(_map_batch)
 
     return dataset

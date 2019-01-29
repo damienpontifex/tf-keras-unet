@@ -9,8 +9,9 @@ from typing import List, Tuple
 import numpy as np
 import progressbar
 import tensorflow as tf
+import cv2
 
-tf.enable_eager_execution()
+# tf.enable_eager_execution()
 
 def _int64_feature(value):
     return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
@@ -22,18 +23,19 @@ def rgb2gray(rgb: np.ndarray) -> np.ndarray:
     return np.dot(rgb[..., :3], [0.299, 0.587, 0.114])
 
 def np_from_img_path(path: str, gray=False) -> np.ndarray:
-    img = tf.io.read_file(path)
-    img = tf.image.decode_image(img)
+    with tf.gfile.Open(path, 'rb') as f:
+        img = np.asarray(bytearray(f.read()), dtype=np.uint8)
+    img = cv2.imdecode(img, cv2.IMREAD_COLOR)
     if gray:
-        img = tf.image.rgb_to_grayscale(img)
-    return img.numpy()
+        img = rgb2gray(img)
+    return img
 
 def convert_to_tfrecords(data_set: List[Tuple[str, str]], name: str, data_directory: str, num_shards: int=1):
     """Convert the dataset to a sharded set of TFRecord files"""
     
     for shard_idx, shard in enumerate(np.array_split(data_set, num_shards)):
-        file_path = os.path.join(data_directory, f'{name}-{shard_idx}.tfrecord')
-        print(f'Writing to {file_path}')
+        file_path = os.path.join(data_directory, '{name}-{shard_idx}.tfrecord'.format(name=name, shard_idx=shard_idx))
+        print('Writing to {}'.format(file_path))
 
         with tf.python_io.TFRecordWriter(file_path) as writer:
             for frame_path, label_path in progressbar.progressbar(shard):

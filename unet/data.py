@@ -2,14 +2,13 @@ import os
 import tensorflow as tf
 
 def _map_batch(record_batch):
-    img_batch = tf.decode_raw(record_batch['image_raw'], tf.uint8)
+    img_batch = tf.decode_raw(record_batch['image/bytes'], tf.uint8)
     img_batch = tf.reshape(img_batch, (-1, 1000, 1000, 3))
     img_batch = tf.image.resize_images(img_batch, (512, 512))
 
     img_batch = tf.image.convert_image_dtype(img_batch, dtype=tf.float32)
 
-    label_batch = tf.decode_raw(record_batch['label_image'], tf.float64)
-    label_batch = tf.image.convert_image_dtype(label_batch, dtype=tf.float32)
+    label_batch = tf.decode_raw(record_batch['image/label'], tf.float32)
     #         label_batch = tf.expand_dims(label_batch, axis=-1)
     label_batch = tf.reshape(label_batch, (-1, 1000, 1000))
     label_batch = tf.expand_dims(label_batch, axis=-1)
@@ -35,7 +34,7 @@ def make_dataset(file_pattern, num_epochs=None, batch_size=32, shuffle=True):
         'image/height': tf.FixedLenFeature([], tf.int64),
         'image/width': tf.FixedLenFeature([], tf.int64),
         'image/label': tf.FixedLenFeature([], tf.string),
-        'image/raw': tf.FixedLenFeature([], tf.string)
+        'image/bytes': tf.FixedLenFeature([], tf.string)
     }
 
     dataset = tf.data.experimental.make_batched_features_dataset(
